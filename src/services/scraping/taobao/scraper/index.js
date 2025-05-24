@@ -6,8 +6,6 @@ const taobaoAuthService = require('../auth');
 const searchProducts = require('./searchProducts');
 const getPopularProducts = require('./getPopularProducts');
 const searchProductsByKeyword = require('./searchProductsByKeyword');
-const getFallbackProducts = require('./getFallbackProducts');
-const getProductsFromAPI = require('./getProductsFromAPI');
 
 /**
  * Service pour scraper les produits de Taobao
@@ -18,8 +16,6 @@ class TaobaoScraperService {
     this.searchProducts = searchProducts.bind(this);
     this.getPopularProducts = getPopularProducts.bind(this);
     this.searchProductsByKeyword = searchProductsByKeyword.bind(this);
-    this.getFallbackProducts = getFallbackProducts.bind(this);
-    this.getProductsFromAPI = getProductsFromAPI.bind(this);
   }
 }
 
