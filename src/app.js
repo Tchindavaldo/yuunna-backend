@@ -9,6 +9,7 @@ const smsRoutes = require('./routes/smsRoutes');
 const bonusRoutes = require('./routes/bonusRoute');
 const imageRoutes = require('./routes/imageRoutes');
 const taobaoRoutes = require('./routes/taobaoRoutes');
+const productRoutes = require('./routes/productRoutes');
 
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -41,5 +42,6 @@ app.use('/bonusRequest', bonusRequest);
 app.use('/transaction', transactionRoutes);
 app.use('/notification', notificationRoutes);
 app.use('/taobao', taobaoRoutes);
+app.use('/products', productRoutes);
 
 module.exports = app;

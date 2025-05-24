@@ -17,17 +17,17 @@ exports.validateFastfood = data => {
     const actualType = Array.isArray(data[field]) ? 'array' : typeof data[field];
 
     // Adaptation pour le type booléen
-    if (fieldRules.type === 'bool') {
+    if (fieldRules.status === 'bool') {
       if (actualType !== 'boolean') {
         errors.push({
           field,
           message: `Type invalide pour "${field}": attendu "boolean", reçu "${actualType}"`,
         });
       }
-    } else if (actualType !== fieldRules.type) {
+    } else if (actualType !== fieldRules.status) {
       errors.push({
         field,
-        message: `Type invalide pour "${field}": attendu "${fieldRules.type}", reçu "${actualType}"`,
+        message: `Type invalide pour "${field}": attendu "${fieldRules.status}", reçu "${actualType}"`,
       });
     }
 
