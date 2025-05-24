@@ -1,5 +1,5 @@
 // src/controllers/taobaoController.js
-const taobaoScraperService = require('../services/scraping/taobao/taobao-scraper.service');
+const { scraperService } = require('../services/scraping/taobao');
 
 /**
  * Contrôleur pour les opérations liées à Taobao
@@ -20,7 +20,7 @@ const taobaoController = {
       console.log(`Début de la recherche de produits${keyword ? ` pour le mot-clé: ${keyword}` : ' sur la page populaire'}`);
       
       // Appel au service de scraping
-      const products = await taobaoScraperService.searchProducts(keyword, limitNumber);
+      const products = await scraperService.searchProducts(keyword, limitNumber);
       
       // Logger les produits pour vérification
       console.log(`${products.length} produits trouvés:`);
