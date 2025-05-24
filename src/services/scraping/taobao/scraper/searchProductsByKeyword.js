@@ -24,6 +24,9 @@ async function searchProductsByKeyword(keyword, limit) {
       browser = await puppeteer.launch({
         headless: 'new',
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+
+        // headless: false, // Affiche le navigateur avec interface graphique
+        // args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
       });
 
       page = await browser.newPage();
@@ -81,25 +84,39 @@ async function searchProductsByKeyword(keyword, limit) {
           }
         }
 
-        // Extraire le prix
-        let price = '';
-        const priceIntElement = $(element).find('.priceInt--yqqZMJ5a');
-        const priceFloatElement = $(element).find('.priceFloat--XpixvyQ1');
+        // // Extraire le prix
+        // let price = '';
+        // const priceIntElement = $(element).find('.priceInt--yqqZMJ5a');
+        // const priceFloatElement = $(element).find('.priceFloat--XpixvyQ1');
 
-        if (priceIntElement.length && priceFloatElement.length) {
-          const priceInt = priceIntElement.text().trim();
-          const priceFloat = priceFloatElement.text().trim();
-          price = `¥${priceInt}${priceFloat}`;
-        } else {
-          // Essayer d'autres sélecteurs de prix courants
-          const altPriceSelectors = ['.price', '.price strong', '.productPrice', '.item-price'];
-          for (const selector of altPriceSelectors) {
-            const altPrice = $(element).find(selector).text().trim();
-            if (altPrice) {
-              // S'assurer que le prix a le symbole yuan
-              price = altPrice.includes('¥') ? altPrice : `¥${altPrice}`;
-              break;
-            }
+        // if (priceIntElement.length && priceFloatElement.length) {
+        //   const priceInt = priceIntElement.text().trim();
+        //   const priceFloat = priceFloatElement.text().trim();
+        //   price = `¥${priceInt}${priceFloat}`;
+        // } else {
+        //   // Essayer d'autres sélecteurs de prix courants
+        //   const altPriceSelectors = ['.price', '.price strong', '.productPrice', '.item-price'];
+        //   for (const selector of altPriceSelectors) {
+        //     const altPrice = $(element).find(selector).text().trim();
+        //     if (altPrice) {
+        //       // S'assurer que le prix a le symbole yuan
+        //       price = altPrice.includes('¥') ? altPrice : `¥${altPrice}`;
+        //       break;
+        //     }
+        //   }
+        // }
+        // Extraire le prix
+
+        let price = '';
+        const wrapper = $(element).find('.innerNormalPriceWrapper--tlX08mH1');
+
+        if (wrapper.length) {
+          const unit = wrapper.find('.unit--D3KGoZe2').text().trim();
+          const priceInt = wrapper.find('.priceInt--yqqZMJ5a').text().trim();
+          const priceFloat = wrapper.find('.priceFloat--XpixvyQ1').text().trim();
+
+          if (priceInt) {
+            price = `${unit || '¥'}${priceInt}${priceFloat}`;
           }
         }
 
