@@ -19,7 +19,7 @@ async function scrapeTaobaoService(keyword = 'montre', limit = null, page = 1) {
 
   const options = new chrome.Options();
   // Mode graphique pour voir le navigateur pendant le scraping
-  // options.addArguments('--headless'); // Commenté pour permettre le mode graphique
+  options.addArguments('--headless'); // Commenté pour permettre le mode graphique
 
   // Options pour optimiser l'exécution en mode graphique
   options.addArguments('--no-sandbox');
@@ -126,11 +126,11 @@ async function scrapeTaobaoService(keyword = 'montre', limit = null, page = 1) {
       await driver.manage().setTimeouts({ pageLoad: 300000 }); // 30 secondes de timeout
       await driver.get(searchUrl);
       await driver.sleep(15000); // Attendre le chargement initial
-      
+
       // Si nous devons aller à une page autre que la première
       if (page > 1) {
         console.log(`Navigation vers la page ${page} en utilisant la pagination JavaScript...`);
-        
+
         // Différentes approches pour naviguer vers la page souhaitée
         try {
           // Approche 1: Utiliser les boutons de pagination s'ils existent
@@ -148,7 +148,7 @@ async function scrapeTaobaoService(keyword = 'montre', limit = null, page = 1) {
                 break;
               }
             }
-            
+
             // Si le bouton n'a pas été trouvé, essayer l'approche suivante
             if (!pageButtonFound) {
               console.log(`Bouton pour la page ${page} non trouvé, essai de l'approche suivante...`);
@@ -157,7 +157,7 @@ async function scrapeTaobaoService(keyword = 'montre', limit = null, page = 1) {
         } catch (paginationError) {
           console.warn(`Erreur lors de la navigation par boutons de pagination: ${paginationError.message}`);
         }
-        
+
         // Approche 2: Modifier l'URL directement et forcer la navigation
         try {
           const pageUrl = `https://s.taobao.com/search?page=${page}&q=${encodeURIComponent(keyword)}`;
@@ -167,7 +167,7 @@ async function scrapeTaobaoService(keyword = 'montre', limit = null, page = 1) {
         } catch (directNavError) {
           console.warn(`Erreur lors de la navigation directe vers la page ${page}: ${directNavError.message}`);
         }
-        
+
         // Approche 3: Utiliser JavaScript pour modifier l'URL et recharger
         try {
           const jsScript = `
@@ -191,11 +191,11 @@ async function scrapeTaobaoService(keyword = 'montre', limit = null, page = 1) {
     try {
       const currentUrl = await driver.getCurrentUrl();
       console.log(`URL actuelle après chargement: ${currentUrl}`);
-      
+
       // Vérifier si l'URL contient le paramètre de page correct
       const urlObj = new URL(currentUrl);
       const urlPage = urlObj.searchParams.get('page');
-      
+
       if (urlPage) {
         console.log(`Page détectée dans l'URL: ${urlPage}, page demandée: ${page}`);
         if (urlPage != page) {
@@ -204,23 +204,23 @@ async function scrapeTaobaoService(keyword = 'montre', limit = null, page = 1) {
       } else {
         console.warn(`ATTENTION: Aucun paramètre de page détecté dans l'URL, nous sommes probablement sur la page 1`);
       }
-      
+
       // Vérifier les éléments de pagination pour confirmer la page actuelle
       try {
         // Rechercher les éléments de pagination qui pourraient indiquer la page actuelle
         const paginationElements = await driver.findElements(By.css('.pagination *'));
         let pageConfirmed = false;
-        
+
         for (const elem of paginationElements) {
           try {
             const elemClass = await elem.getAttribute('class');
             const elemText = await elem.getText();
-            
+
             // Vérifier si c'est un élément actif/sélectionné dans la pagination
             if (elemClass && elemClass.includes('active') && elemText) {
               console.log(`Page actuelle détectée dans la pagination: ${elemText}`);
               pageConfirmed = true;
-              
+
               if (elemText != String(page)) {
                 console.warn(`ATTENTION: La page active dans la pagination (${elemText}) ne correspond pas à la page demandée (${page})`);
               }
@@ -230,7 +230,7 @@ async function scrapeTaobaoService(keyword = 'montre', limit = null, page = 1) {
             // Ignorer les erreurs pour les éléments individuels
           }
         }
-        
+
         if (!pageConfirmed) {
           console.log(`Impossible de confirmer la page actuelle via les éléments de pagination`);
         }
@@ -243,19 +243,19 @@ async function scrapeTaobaoService(keyword = 'montre', limit = null, page = 1) {
 
     // 4. Récupérer les produits avec plusieurs sélecteurs pour plus de robustesse
     console.log(`Tentative de récupération des produits pour la page ${page}...`);
-    
+
     // Utiliser plusieurs sélecteurs CSS pour trouver les produits (Taobao peut changer la structure selon les pages)
     const selectors = [
-      "div[class*='search-content-col'] > a",  // Sélecteur original
-      ".item.J_MouserOnverReq",               // Sélecteur alternatif 1
-      ".items > .item",                      // Sélecteur alternatif 2
-      "div[data-index]",                      // Sélecteur alternatif 3
-      "div.grid-item"                         // Sélecteur alternatif 4
+      "div[class*='search-content-col'] > a", // Sélecteur original
+      '.item.J_MouserOnverReq', // Sélecteur alternatif 1
+      '.items > .item', // Sélecteur alternatif 2
+      'div[data-index]', // Sélecteur alternatif 3
+      'div.grid-item', // Sélecteur alternatif 4
     ];
-    
+
     let products = [];
-    let selectorUsed = "";
-    
+    let selectorUsed = '';
+
     // Essayer chaque sélecteur jusqu'à trouver des produits
     for (const selector of selectors) {
       try {
@@ -263,14 +263,14 @@ async function scrapeTaobaoService(keyword = 'montre', limit = null, page = 1) {
         if (foundProducts.length > 0) {
           products = foundProducts;
           selectorUsed = selector;
-          console.log(`Produits trouvés avec le sélecteur: ${selector} (${products.length} produits)`);          
+          console.log(`Produits trouvés avec le sélecteur: ${selector} (${products.length} produits)`);
           break;
         }
       } catch (selectorError) {
         console.warn(`Erreur avec le sélecteur ${selector}: ${selectorError.message}`);
       }
     }
-    
+
     // Si aucun produit n'est trouvé avec les sélecteurs spécifiques, essayer de capturer une capture d'écran pour débogage
     if (products.length === 0) {
       console.warn(`Aucun produit trouvé avec les sélecteurs standards pour la page ${page}!`);
@@ -280,7 +280,7 @@ async function scrapeTaobaoService(keyword = 'montre', limit = null, page = 1) {
         const screenshotPath = path.join(__dirname, `taobao_page_${page}_debug_${Date.now()}.png`);
         await fs.writeFile(screenshotPath, screenshot, 'base64');
         console.log(`Capture d'écran enregistrée pour débogage: ${screenshotPath}`);
-        
+
         // Dernier recours: essayer de récupérer tous les liens de la page
         products = await driver.findElements(By.css('a[href*="item.taobao"]'));
         if (products.length > 0) {
@@ -291,7 +291,7 @@ async function scrapeTaobaoService(keyword = 'montre', limit = null, page = 1) {
         console.error(`Impossible de prendre une capture d'écran: ${screenshotError.message}`);
       }
     }
-    
+
     let results = [];
 
     // Si limit est null ou non défini, récupérer tous les produits de la page
