@@ -32,17 +32,12 @@ router.get('/:productId', getProductById);
 
 /**
  * @route   GET /products
- * @desc    Récupère tous les produits avec pagination, tri et filtres
+ * @desc    Récupère tous les produits avec filtres optionnels
  * @access  Public
- * @query   {number} page - Numéro de page (commence à 1, défaut: 1)
- * @query   {number} limit - Nombre d'éléments par page (défaut: 10)
- * @query   {string} sort - Critère de tri (ex: "price_asc", "date_desc", "title_asc", défaut: "date_desc")
- * @query   {string} category - Filtre par catégorie (optionnel)
- * @query   {string} categoryId - Alias pour category (support de l'ancien paramètre)
- * @query   {string} search - Recherche textuelle dans les titres, catégories et vendeurs (optionnel)
+ * @query   {string} categoryId - Filtre par catégorie (optionnel)
  * @query   {string} userId - Filtre par utilisateur (optionnel)
- * @query   {string} status - Filtre par statut (défaut: "active")
- * @returns {Object} - { success, items, total, hasMore, page, limit }
+ * @query   {string} status - Filtre par statut (optionnel)
+ * @query   {number} limit - Limite le nombre de résultats (optionnel)
  */
 router.get('/', getProducts);
 
